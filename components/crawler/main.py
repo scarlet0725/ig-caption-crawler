@@ -22,9 +22,11 @@ def main():
     ig_username = os.getenv("IG_USERNAME")
     ig_password = os.getenv("IG_PASSWORD")
     subscription_path = os.getenv("SUBSCRIPTION_PATH")
+    topic = os.getenv("TOPIC")
 
     storage_client = storage.Client(project=project_id)
     subscriber = pubsub_v1.SubscriberClient(project=project_id)
+    publisher = pubsub_v1.PublisherClient(project=project_id)
     instagrapi_config = gcs.get_instagrapi_config(storage_client)
     ig_client = instagrapi.Client(settings=instagrapi_config)
 
@@ -47,6 +49,7 @@ def main():
         })
 
     subscriber.acknowledge(ack_ids=[ack_id])
+    publisher.publish(topic=topic, data=new_caption)
 
 
 if __name__ == "__main__":
