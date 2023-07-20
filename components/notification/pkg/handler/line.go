@@ -69,12 +69,17 @@ func (l *lineNotificationHandler) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	msg.WithSender(sender)
 
 	ctx := r.Context()
-	_, err := l.line.BroadcastMessage().WithContext(ctx).Do()
+	_, err := l.line.BroadcastMessage(msg).WithContext(ctx).Do()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	resp := domain.NotificationResponse{
+		Ok: true,
+	}
+
+	_ = json.NewEncoder(w).Encode(resp)
 	w.WriteHeader(http.StatusOK)
 
 }

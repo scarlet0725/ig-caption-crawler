@@ -5,3 +5,7 @@ type NotificationRequest struct {
 	Message string `json:"message,omitempty"`
 	Name    string `json:"name,omitempty"`
 }
+
+type NotificationResponse struct {
+	Ok bool `json:"ok,omitempty"`
+}
