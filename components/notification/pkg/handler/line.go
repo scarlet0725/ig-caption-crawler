@@ -54,6 +54,10 @@ func (l *lineWebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *lineNotificationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 	request := domain.NotificationRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
