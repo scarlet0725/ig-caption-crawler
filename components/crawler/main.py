@@ -48,18 +48,26 @@ def main():
     new_caption = base64.b64encode(detail.caption_text.encode())
 
     if new_caption != old_caption:
-        requests.post(notify_endpoint, json={
+        notify_response = requests.post(notify_endpoint, json={
             "icon_url": detail.user.profile_pic_url_hd,
             "message": detail.caption_text,
             "name": detail.user.full_name
         })
+        try:
+            notify_response.raise_for_status()
+        except Exception as e:
+            logger.error(e)
+            return
+
+    publish_future = publisher.publish(topic=topic, data=new_caption)
 
     try:
-        publisher.publish(topic=topic, data=new_caption)
-    except:
-        return
+        publish_future.result()
+    except Exception as e:
+        logger.error(e)
     else:
-        subscriber.acknowledge(ack_ids=[ack_id])
+        if ack_id != "":
+            subscriber.acknowledge(subscription=subscription_path, ack_ids=[ack_id])
 
 
 if __name__ == "__main__":
