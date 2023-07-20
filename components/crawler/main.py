@@ -45,7 +45,7 @@ def main():
         logger.error(e)
         return
 
-    new_caption = base64.b64encode(detail.caption_text)
+    new_caption = base64.b64encode(detail.caption_text.encode())
 
     if new_caption != old_caption:
         requests.post(notify_endpoint, json={
