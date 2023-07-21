@@ -38,8 +38,8 @@ func main() {
 	lineNotificationHandler := handler.NewLineNotificationHandler(line)
 
 	mux := http.NewServeMux()
-	mux.Handle("/line", lineWebhookHandler)
-	mux.Handle("/notification/line", lineNotificationHandler)
+	mux.Handle("/line", handler.PostOnlyMiddleware(lineWebhookHandler))
+	mux.Handle("/notification/line", handler.PostOnlyMiddleware(lineNotificationHandler))
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),
