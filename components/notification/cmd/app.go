@@ -24,8 +24,9 @@ func main() {
 
 	channelSecret := os.Getenv("LINE_CHANNEL_SECRET")
 	channelToken := os.Getenv("LINE_CHANNEL_TOKEN")
+	discordWebhookURL := os.Getenv("DISCORD_WEBHOOK")
 
-	if channelSecret == "" || channelToken == "" {
+	if channelSecret == "" || channelToken == "" || discordWebhookURL == "" {
 		log.Fatalf("channel secret or channelToken is not set")
 	}
 	line, err := linebot.New(channelSecret, channelToken)
@@ -36,10 +37,12 @@ func main() {
 
 	lineWebhookHandler := handler.NewLineWebhookHandler(line)
 	lineNotificationHandler := handler.NewLineNotificationHandler(line)
+	discordNotificationHandler := handler.NewDiscordNotificationHandler(discordWebhookURL)
 
 	mux := http.NewServeMux()
 	mux.Handle("/line", handler.PostOnlyMiddleware(lineWebhookHandler))
 	mux.Handle("/notification/line", handler.PostOnlyMiddleware(lineNotificationHandler))
+	mux.Handle("/notification/discord", handler.PostOnlyMiddleware(discordNotificationHandler))
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),
