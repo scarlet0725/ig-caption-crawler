@@ -11,7 +11,6 @@ import pubsub
 import logging
 
 
-
 def main():
     logger = logging.getLogger()
     try:
@@ -30,6 +29,7 @@ def main():
     ig_password = os.getenv("IG_PASSWORD")
     subscription_path = os.getenv("SUBSCRIPTION_PATH")
     topic = os.getenv("TOPIC")
+    api_key = os.getenv("API_KEY")
 
     storage_client = storage.Client(project=project_id)
     subscriber = pubsub_v1.SubscriberClient()
@@ -50,20 +50,31 @@ def main():
     new_caption = base64.b64encode(detail.caption_text.encode())
 
     if new_caption != old_caption:
-        notify_response = requests.post(f"{notify_endpoint}/notification/line", json={
-            "icon_url": detail.user.profile_pic_url,
-            "message": detail.caption_text,
-            "name": detail.user.full_name
-        })
-        discord_notify = requests.post(f"{notify_endpoint}/notification/discord", json=
-        {
-            "icon_url": detail.user.profile_pic_url,
-            "message": detail.caption_text,
-            "name": detail.user.full_name,
-            "profile_url": f"https://www.instagram.com/{detail.user.username}",
-            "title": "PRSMINライブスケジュール",
-            "post_url": f"https://www.instagram.com/p/{detail.code}"
-        })
+        notify_response = requests.post(f"{notify_endpoint}/notification/line",
+                                        json={
+                                            "icon_url": detail.user.profile_pic_url,
+                                            "message": detail.caption_text,
+                                            "name": detail.user.full_name
+                                        },
+                                        headers={
+                                            "X-API-KEY": api_key
+                                        }
+                                        )
+
+        discord_notify = requests.post(f"{notify_endpoint}/notification/discord",
+                                       json=
+                                       {
+                                           "icon_url": detail.user.profile_pic_url,
+                                           "message": detail.caption_text,
+                                           "name": detail.user.full_name,
+                                           "profile_url": f"https://www.instagram.com/{detail.user.username}",
+                                           "title": "PRSMINライブスケジュール",
+                                           "post_url": f"https://www.instagram.com/p/{detail.code}"
+                                       },
+                                       headers={
+                                           "X-API-KEY": api_key
+                                       }
+                                       )
         try:
             notify_response.raise_for_status()
             discord_notify.raise_for_status()
