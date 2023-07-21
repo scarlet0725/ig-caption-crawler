@@ -9,3 +9,10 @@ type NotificationRequest struct {
 type NotificationResponse struct {
 	Ok bool `json:"ok,omitempty"`
 }
+
+type DiscordNotificationRequest struct {
+	ProfileURL string `json:"profile_url,omitempty"`
+	PostURL    string `json:"post_url,omitempty"`
+	Title      string `json:"title,omitempty"`
+	NotificationRequest
+}
