@@ -19,8 +19,10 @@ def main():
             "Metadata-Flavor": "Google"
         }).text
     except Exception as e:
-        logging.error(e)
-        return
+        project_id = os.getenv("PROJECT_ID")
+        if project_id == "":
+            logger.error(e)
+            return
 
     notify_endpoint = os.getenv("NOTIFY_ENDPOINT")
     url = os.getenv("INSTAGRAM_POST_CODE")
@@ -49,7 +51,7 @@ def main():
 
     if new_caption != old_caption:
         notify_response = requests.post(notify_endpoint, json={
-            "icon_url": detail.user.profile_pic_url_hd,
+            "icon_url": detail.user.profile_pic_url,
             "message": detail.caption_text,
             "name": detail.user.full_name
         })
